@@ -12,6 +12,7 @@ class Auth(object):
     """
 
     _user_detail_cache = {}
+    _user_full_detail_cache = {}
 
     def __init__(self):
         self.base_request = BaseRequest()
@@ -36,6 +37,32 @@ class Auth(object):
             )
 
         return self._user_detail_cache
+
+    def __get_full_user_data(self):
+        """
+        Get all user details.
+
+        Returns:
+            dict: user details.
+
+        Raises:
+            NotLoggedIn: if there is no user logged in.
+
+        """
+
+        if not self._user_full_detail_cache:
+
+            params = {
+                'filter': 'id',
+                'eq': self.get_user_id()
+            }
+
+            self._user_full_detail_cache = self.base_request.request(
+                'user', 'get', params=params,
+                endpoint=self.settings.get('pine_endpoint')
+            )['d'][0]
+
+        return self._user_full_detail_cache
 
     def __get_property(self, element):
         """
